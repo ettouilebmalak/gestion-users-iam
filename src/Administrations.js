@@ -1,23 +1,26 @@
 import { administrations } from "./data";
 
-function Administrations(keycloak) {
+function Administrations() {
   return (
-    <table border="1" cellPadding="10">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-        </tr>
-      </thead>
-      <tbody>
-        {administrations.map((admin) => (
-          <tr key={admin.administration_id}>
-            <td>{admin.administration_id}</td>
-            <td>{admin.title}</td>
+    <div style={{ maxWidth: "600px", margin: "30px auto", fontFamily: "Arial, sans-serif" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#1e3a8a" }}>Administrations</h2>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead style={{ backgroundColor: "#1e3a8a", color: "white" }}>
+          <tr>
+            <th style={{ padding: "10px" }}>ID</th>
+            <th style={{ padding: "10px" }}>Nom</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {administrations.map((admin, index) => (
+            <tr key={admin.administration_id} style={{ backgroundColor: index % 2 === 0 ? "#f8fafc" : "white" }}>
+              <td style={{ padding: "10px", border: "1px solid #e2e8f0" }}>{admin.administration_id}</td>
+              <td style={{ padding: "10px", border: "1px solid #e2e8f0" }}>{admin.title}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
