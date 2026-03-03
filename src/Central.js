@@ -74,99 +74,167 @@ function AdminCentral({ keycloak }) {
   return (
     <>
       <Header keycloak={keycloak} />
-      <div style={{ paddingTop: "60px", textAlign: "center" }}>
-        <h1 style={{ color: "#1e3a8a" }}>Admin Central</h1>
+      <div style={{
+        paddingTop: "110px",
+        textAlign: "center",
+        backgroundColor: "#f1f5f9",
+        minHeight: "100vh",
+        fontFamily: "Arial, sans-serif"
+      }}>
+        <h1 style={{ color: "#1e3a8a", marginBottom: "30px" }}>Admin Central</h1>
 
-        <div style={{ marginBottom: "20px", display: "flex", justifyContent: "center", gap: "20px" }}>
-          <button onClick={() => setView("list")}>Liste utilisateurs</button>
-          <button onClick={() => setView("create")}>Créer utilisateur</button>
-          <button onClick={() => setView("administrations")}>Administrations</button>
+        {/* Navigation boutons */}
+        <div style={{ marginBottom: "30px", display: "flex", justifyContent: "center", gap: "15px" }}>
+          <button style={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            backgroundColor: view === "list" ? "#1e3a8a" : "#e2e8f0",
+            color: view === "list" ? "white" : "#1e293b",
+            fontWeight: "600",
+            transition: "0.3s"
+          }} onClick={() => setView("list")}>Liste utilisateurs</button>
+
+          <button style={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            backgroundColor: view === "create" ? "#1e3a8a" : "#e2e8f0",
+            color: view === "create" ? "white" : "#1e293b",
+            fontWeight: "600",
+            transition: "0.3s"
+          }} onClick={() => setView("create")}>Créer utilisateur</button>
+
+          <button style={{
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "none",
+            cursor: "pointer",
+            backgroundColor: view === "administrations" ? "#1e3a8a" : "#e2e8f0",
+            color: view === "administrations" ? "white" : "#1e293b",
+            fontWeight: "600",
+            transition: "0.3s"
+          }} onClick={() => setView("administrations")}>Administrations</button>
         </div>
 
-        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-          {view === "list" && (
-            <>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Filtrer par rôle: </label>
-                <select value={searchRole} onChange={e => setSearchRole(e.target.value)}>
-                  <option value="">Tous</option>
-                  <option value="admin_local">Admin Local</option>
-                  <option value="commission">Commission</option>
-                  <option value="referentiel">Référentiel</option>
+        {/* Filtre */}
+        {view === "list" && (
+          <div style={{ marginBottom: "20px" }}>
+            <label style={{ marginRight: "10px", fontWeight: "500" }}>Filtrer par rôle:</label>
+            <select value={searchRole} onChange={e => setSearchRole(e.target.value)} style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "1px solid #cbd5e1",
+              backgroundColor: "#f8fafc",
+              cursor: "pointer",
+              minWidth: "200px"
+            }}>
+              <option value="">Tous</option>
+              <option value="admin_local">Admin Local</option>
+              <option value="commission">Commission</option>
+              <option value="referentiel">Référentiel</option>
+            </select>
+          </div>
+        )}
+
+        {/* Tableau */}
+        {view === "list" && (
+          <table style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            fontSize: "14px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            overflow: "hidden"
+          }}>
+            <thead style={{ backgroundColor: "#1e3a8a", color: "white", textAlign: "left" }}>
+              <tr>
+                <th style={{ padding: "12px" }}>Nom</th>
+                <th style={{ padding: "12px" }}>Prénom</th>
+                <th style={{ padding: "12px" }}>Email</th>
+                <th style={{ padding: "12px" }}>Téléphone</th>
+                <th style={{ padding: "12px" }}>Rôle</th>
+                <th style={{ padding: "12px" }}>Administration</th>
+                <th style={{ padding: "12px" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user, i) => (
+                <tr key={user.id} style={{ backgroundColor: i % 2 === 0 ? "#f8fafc" : "white" }}>
+                  <td style={{ padding: "10px" }}>{user.lastName}</td>
+                  <td style={{ padding: "10px" }}>{user.firstName}</td>
+                  <td style={{ padding: "10px" }}>{user.email}</td>
+                  <td style={{ padding: "10px" }}>{user.attributes?.telephone?.[0] || "-"}</td>
+                  <td style={{ padding: "10px" }}>{user.attributes?.idaratiRole?.join(", ") || "-"}</td>
+                  <td style={{ padding: "10px" }}>
+                    {user.attributes?.idaratiRole?.[0] === "admin_local" ? user.attributes?.admId?.[0] || "-" : "-"}
+                  </td>
+                  <td style={{ padding: "10px" }}>
+                    <button style={{
+                      backgroundColor: "#dc2626",
+                      color: "white",
+                      border: "none",
+                      padding: "6px 12px",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      transition: "0.2s"
+                    }}
+                    onMouseOver={e => e.target.style.backgroundColor="#b91c1c"}
+                    onMouseOut={e => e.target.style.backgroundColor="#dc2626"}
+                    onClick={() => handleDelete(user.id)}
+                    >
+                      Supprimer
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {/* Formulaire création */}
+        {view === "create" && (
+          <div style={{
+            maxWidth: "500px",
+            margin: "20px auto",
+            padding: "25px",
+            borderRadius: "12px",
+            backgroundColor: "white",
+            boxShadow: "0 6px 20px rgba(0,0,0,0.08)"
+          }}>
+            <h2 style={{ textAlign: "center", marginBottom: "20px", color: "#1e3a8a" }}>Créer un utilisateur</h2>
+            <form onSubmit={handleCreateUser} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+              <input name="nom" placeholder="Nom" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+              <input name="prenom" placeholder="Prénom" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+              <input name="email" type="email" placeholder="Email" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+              <input name="telephone" type="tel" placeholder="Téléphone" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
+
+              <select name="role" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc" }} onChange={e => setSelectedRole(e.target.value)}>
+                <option value="">Sélectionner un rôle</option>
+                <option value="admin_local">Admin Local</option>
+                <option value="commission">Commission</option>
+                <option value="referentiel">Référentiel</option>
+              </select>
+
+              {selectedRole === "admin_local" && (
+                <select name="administration" required style={{ padding: "10px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "#f8fafc" }}>
+                  <option value="">Sélectionner administration</option>
+                  {administrations.map(a => <option key={a.administration_id} value={a.title}>{a.title}</option>)}
                 </select>
+              )}
+
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button type="submit" style={{ flex: 1, padding: "12px", borderRadius: "8px", border: "none", backgroundColor: "#1e3a8a", color: "white", cursor: "pointer", fontWeight: "600" }}>Créer</button>
+                <button type="button" onClick={() => setView("list")} style={{ flex: 1, padding: "12px", borderRadius: "8px", border: "none", backgroundColor: "#ccc", cursor: "pointer" }}>Annuler</button>
               </div>
+            </form>
+          </div>
+        )}
 
-              <table border="1" width="100%" style={{ marginTop: "10px", borderCollapse: "collapse" }}>
-                <thead style={{ backgroundColor: "#1e3a8a", color: "white" }}>
-                  <tr>
-                    <th style={{ padding: "8px" }}>Nom</th>
-                    <th style={{ padding: "8px" }}>Prénom</th>
-                    <th style={{ padding: "8px" }}>Email</th>
-                    <th style={{ padding: "8px" }}>Téléphone</th>
-                    <th style={{ padding: "8px" }}>Rôle</th>
-                    <th style={{ padding: "8px" }}>Administration</th>
-                    <th style={{ padding: "8px" }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map(user => (
-                    <tr key={user.id}>
-                      <td style={{ padding: "6px" }}>{user.lastName}</td>
-                      <td style={{ padding: "6px" }}>{user.firstName}</td>
-                      <td style={{ padding: "6px" }}>{user.email}</td>
-                      <td style={{ padding: "6px" }}>{user.attributes?.telephone?.[0] || "-"}</td>
-                      <td style={{ padding: "6px" }}>{user.attributes?.idaratiRole?.join(", ") || "-"}</td>
-                      <td style={{ padding: "6px" }}>
-                        {user.attributes?.idaratiRole?.[0] === "admin_local" ? user.attributes?.admId?.[0] || "-" : "-"}
-                      </td>
-                      <td style={{ padding: "6px" }}>
-                        <button onClick={() => handleDelete(user.id)}
-                          style={{ backgroundColor: "red", color: "white", border: "none", padding: "5px 10px", cursor: "pointer" }}>
-                          Supprimer
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-
-          {view === "create" && (
-            <div style={{ maxWidth: "500px", margin: "20px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
-              <h2 style={{ textAlign: "center", color: "#1e3a8a" }}>Créer un utilisateur</h2>
-              <form onSubmit={handleCreateUser} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                <input name="nom" placeholder="Nom" required style={{ padding: "8px" }} />
-                <input name="prenom" placeholder="Prénom" required style={{ padding: "8px" }} />
-                <input name="email" type="email" placeholder="Email" required style={{ padding: "8px" }} />
-                <input name="telephone" type="tel" placeholder="Téléphone" required style={{ padding: "8px" }} />
-
-                <div>
-                  <label>Rôle:</label>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <label><input type="radio" name="role" value="admin_local" required onChange={e => setSelectedRole(e.target.value)} /> Admin Local</label>
-                    <label><input type="radio" name="role" value="commission" onChange={e => setSelectedRole(e.target.value)} /> Commission</label>
-                    <label><input type="radio" name="role" value="referentiel" onChange={e => setSelectedRole(e.target.value)} /> Référentiel</label>
-                  </div>
-                </div>
-
-                {selectedRole === "admin_local" && (
-                  <select name="administration" required style={{ padding: "8px" }}>
-                    <option value="">-- Sélectionner --</option>
-                    {administrations.map(admin => <option key={admin.administration_id} value={admin.title}>{admin.title}</option>)}
-                  </select>
-                )}
-
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button type="submit" style={{ flex: 1, backgroundColor: "#1e3a8a", color: "white", padding: "10px", cursor: "pointer" }}>Créer</button>
-                  <button type="button" onClick={() => setView("list")} style={{ flex: 1, backgroundColor: "#ccc", padding: "10px", cursor: "pointer" }}>Annuler</button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {view === "administrations" && <Administrations />}
-        </div>
+        {view === "administrations" && <Administrations />}
       </div>
     </>
   );
